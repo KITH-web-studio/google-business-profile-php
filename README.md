@@ -54,6 +54,12 @@ foreach ($accounts['accounts'] ?? [] as $account) {
 
 SDK добавляет OAuth-токен к запросам и использует Google PHP Client для обновления токена при наличии `refresh_token`. Реализация OAuth callback и сохранение токенов принадлежат приложению. После обновления текущий токен можно получить через `$google->getAccessToken()`. При первичной авторизации для фоновой работы используйте `setAccessType('offline')`. Сохраните прежний `refresh_token`, если при повторной авторизации Google вернул только access token. [OAuth для Business Profile](https://developers.google.com/my-business/content/implement-oauth)
 
+## Приём уведомлений Cloud Pub/Sub
+
+`GoogleBusinessProfile\PubSub\PushReceiver` принимает заголовок `Authorization` и сырое тело HTTP-запроса от аутентифицированной push-подписки с JSON-обёрткой. Для проверки подписи используется OpenSSL. Укажите ожидаемые audience, адрес сервисного аккаунта доставки и полное имя подписки. Метод `receive()` возвращает тип события, ID сообщения, имя подписки, данные и атрибуты. [Аутентификация Pub/Sub](https://cloud.google.com/pubsub/docs/authenticate-push-subscriptions)
+
+В [примере для Laravel](examples/laravel/README.md) событие `NEW_REVIEW` запускает загрузку отзыва через SDK. Создание топика, подписки и HTTP-маршрута описано там же.
+
 ## Параметры и ошибки
 
 - Передавайте полные имена ресурсов Google, например `locations/456` для v1 и `accounts/123/locations/456` для отзывов v4.
