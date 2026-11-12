@@ -13,8 +13,7 @@ Composer-пакет для Google Business Profile REST API. Требуется 
 Выполните в корне вашего проекта.
 
 ```sh
-composer config repositories.google-business-profile vcs https://github.com/KITH-web-studio/google-business-profile-php
-composer require kith-web-studio/google-business-profile-php:dev-main
+composer require kith-web-studio/google-business-profile-php
 ```
 
 ## OAuth и чтение отзывов
