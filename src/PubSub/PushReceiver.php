@@ -7,7 +7,6 @@ namespace GoogleBusinessProfile\PubSub;
 use Google\AccessToken\Verify;
 use GuzzleHttp\Client as HttpClient;
 use InvalidArgumentException;
-use JsonException;
 use UnexpectedValueException;
 
 final class PushReceiver
@@ -37,7 +36,7 @@ final class PushReceiver
     {
         $this->authenticate($authorization);
 
-        $envelope = $this->decodeObject($body);
+        $envelope = MessageDecoder::jsonObject($body);
         if (($envelope['subscription'] ?? null) !== $this->subscription) {
             throw new AuthenticationException('Unexpected Pub/Sub subscription.');
         }
@@ -47,33 +46,7 @@ final class PushReceiver
             throw new InvalidArgumentException('Expected a wrapped Pub/Sub message.');
         }
 
-        $messageId = $message['messageId'] ?? $message['message_id'] ?? null;
-        if (!is_string($messageId) || $messageId === '') {
-            throw new InvalidArgumentException('The Pub/Sub message ID is missing.');
-        }
-
-        $attributes = $message['attributes'] ?? [];
-        if (!is_array($attributes)) {
-            throw new InvalidArgumentException('Invalid Pub/Sub message attributes.');
-        }
-
-        $data = [];
-        $encoded = $message['data'] ?? '';
-        if ($encoded !== '') {
-            $decoded = is_string($encoded) ? base64_decode($encoded, true) : false;
-            if ($decoded === false) {
-                throw new InvalidArgumentException('Invalid Pub/Sub message encoding.');
-            }
-            $data = $this->decodeObject($decoded);
-        }
-
-        $type = $data['type'] ?? $data['notification_type'] ?? $data['notificationType']
-            ?? $attributes['type'] ?? $attributes['notification_type'] ?? $attributes['notificationType'] ?? null;
-        if (!is_string($type) || trim($type) === '') {
-            throw new InvalidArgumentException('The Business Profile notification type is missing.');
-        }
-
-        return new Notification($type, $messageId, $this->subscription, $data, $attributes);
+        return MessageDecoder::notification($this->subscription, $message);
     }
 
     private function authenticate(?string $authorization): void
@@ -97,20 +70,5 @@ final class PushReceiver
         ) {
             throw new AuthenticationException('Invalid Pub/Sub bearer token.');
         }
-    }
-
-    private function decodeObject(string $json): array
-    {
-        try {
-            $decoded = json_decode($json, true, 64, JSON_THROW_ON_ERROR | JSON_BIGINT_AS_STRING);
-        } catch (JsonException $error) {
-            throw new InvalidArgumentException('Invalid Pub/Sub JSON.', previous: $error);
-        }
-
-        if (!is_array($decoded) || !str_starts_with(ltrim($json), '{')) {
-            throw new InvalidArgumentException('Expected a JSON object in the Pub/Sub notification.');
-        }
-
-        return $decoded;
     }
 }
