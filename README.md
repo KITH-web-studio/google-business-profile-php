@@ -60,7 +60,7 @@ SDK добавляет OAuth-токен к запросам и использу�
 
 `GoogleBusinessProfile\PubSub\PullReceiver` забирает пачку из pull-подписки с помощью `pull()`. У каждого сообщения есть `notification()` для декодирования и `deliveryAttempt`, если Google прислал номер попытки. После успешной обработки передайте сообщение в `acknowledge()`. Метод `modifyAckDeadline()` меняет срок подтверждения конкретного сообщения. Нулевой срок означает NACK. Для подключения из среды с Application Default Credentials используйте `fromApplicationDefaultCredentials()`. [Получение сообщений через pull](https://cloud.google.com/pubsub/docs/pull-messages)
 
-В [примерах для Laravel](examples/laravel/README.md) событие `NEW_REVIEW` запускает загрузку отзыва через SDK. Там же описаны настройка push-маршрута и запуск pull-команды Artisan.
+Событие `NEW_REVIEW` запускает загрузку отзыва через SDK. Доступны [примеры на чистом PHP](examples/php/README.md) с HTTP-обработчиком и CLI-скриптом и [примеры для Laravel](examples/laravel/README.md) с маршрутом и командой Artisan.
 
 ## Параметры и ошибки
 
