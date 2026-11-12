@@ -1,0 +1,6 @@
+/vendor/
+/composer.lock
+/.env
+/.env.*
+/auth.json
+/tools/__pycache__/
